@@ -11,8 +11,8 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "codesleeve/stapler": "1.0.*",
-        "laravel/framework": "4.*|5.*"
+        "codesleeve/stapler": "dev-master",
+        "laravel/framework": "5.*"
     },
     "autoload": {
         "classmap": [
