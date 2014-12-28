@@ -1,10 +1,11 @@
 <?php namespace Codesleeve\LaravelStapler;
 
-use Config;
 use Illuminate\Support\ServiceProvider;
 use Codesleeve\LaravelStapler\Services\ImageRefreshService;
 use Codesleeve\Stapler\Stapler;
 use Codesleeve\Stapler\Config\IlluminateConfig;
+use Codesleeve\LaravelStapler\Commands\FastenCommand;
+use Codesleeve\LaravelStapler\Commands\RefreshCommand;
 
 class LaravelStaplerServiceProvider extends ServiceProvider {
 
@@ -22,7 +23,6 @@ class LaravelStaplerServiceProvider extends ServiceProvider {
 	 */
 	public function boot()
 	{
-		$this->package('codesleeve/laravel-stapler', null, __DIR__);
 		$this->bootstrapStapler();
 	}
 
@@ -40,7 +40,7 @@ class LaravelStaplerServiceProvider extends ServiceProvider {
 		// services
 		$this->registerImageRefreshService();
 
-        $this->commands('stapler.fasten');
+        	$this->commands('stapler.fasten');
 		$this->commands('stapler.refresh');
 	}
 
@@ -67,7 +67,7 @@ class LaravelStaplerServiceProvider extends ServiceProvider {
 	{
         Stapler::boot();
 
-        $config = new IlluminateConfig(Config::getFacadeRoot(), 'laravel-stapler');
+        $config = new IlluminateConfig($this->app['config'], 'stapler');
         Stapler::setConfigInstance($config);
 
         if (!$config->get('stapler.public_path')) {
@@ -86,9 +86,9 @@ class LaravelStaplerServiceProvider extends ServiceProvider {
 	 */
 	protected function registerStaplerFastenCommand()
 	{
-		$this->app->bind('stapler.fasten', function($app)
+		$this->app->bind('stapler.fasten', function()
 		{
-			return new Commands\FastenCommand;
+			return new FastenCommand;
 		});
 	}
 
@@ -103,7 +103,7 @@ class LaravelStaplerServiceProvider extends ServiceProvider {
 		{
 			$refreshService = $app['ImageRefreshService'];
 
-			return new Commands\RefreshCommand($refreshService);
+			return new RefreshCommand($refreshService);
 		});
 	}
 
@@ -114,7 +114,7 @@ class LaravelStaplerServiceProvider extends ServiceProvider {
      */
     protected function registerImageRefreshService()
     {
-        $this->app->singleton('ImageRefreshService', function($app, $params) {
+        $this->app->singleton('ImageRefreshService', function() {
             return new ImageRefreshService();
         });
     }
